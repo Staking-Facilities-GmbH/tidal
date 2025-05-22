@@ -1,0 +1,12 @@
+<svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="tidal-gradient" x1="0" y1="0" x2="64" y2="64" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#00eaff"/>
+      <stop offset="1" stop-color="#7f5af0"/>
+    </linearGradient>
+  </defs>
+  <rect x="8" y="8" width="48" height="48" rx="12" fill="url(#tidal-gradient)"/>
+  <path d="M16 40 Q32 24 48 40" stroke="#fff" stroke-width="4" fill="none"/>
+  <rect x="28" y="20" width="8" height="8" rx="2" fill="#fff" fill-opacity="0.9"/>
+  <rect x="30" y="22" width="4" height="4" rx="1" fill="url(#tidal-gradient)"/>
+</svg> 
