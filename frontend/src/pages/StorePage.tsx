@@ -4,6 +4,7 @@ import { supabase } from '../utils/supabase';
 import { useCurrentAccount, useSuiClient, useSignAndExecuteTransaction } from '@mysten/dapp-kit';
 import { Transaction } from '@mysten/sui/transactions';
 import { useNetworkVariable } from '../networkConfig';
+import { MIST_PER_SUI } from '@mysten/sui/utils';
 
 const PAGE_SIZE = 10;
 
@@ -16,7 +17,7 @@ export function StorePage() {
   const [filterName, setFilterName] = useState('');
   const [filterTag, setFilterTag] = useState('');
   const [userPurchases, setUserPurchases] = useState<string[]>([]);
-  const [purchaseStatus, setPurchaseStatus] = useState<{[assetId: string]: string}>({});
+  const [purchaseStatus, setPurchaseStatus] = useState<{ [assetId: string]: string }>({});
   const account = useCurrentAccount();
   const packageId = useNetworkVariable('packageId');
   const suiClient = useSuiClient();
@@ -131,7 +132,7 @@ export function StorePage() {
       <Card>
         <Flex direction="column" gap="4">
           <Text size="5" weight="bold">Asset Store</Text>
-          
+
           <input
             className="radix-themes"
             placeholder="Filter by name"
@@ -154,7 +155,6 @@ export function StorePage() {
             <Text>Loading assets...</Text>
           ) : (
             <Flex direction="column" gap="2">
-              {console.log('[StorePage DEBUG] assetList:', assetList)}
               {assetList.map((asset) => (
                 <Card key={asset.id}>
                   <div className="asset-info">
@@ -164,16 +164,16 @@ export function StorePage() {
                     <div className="asset-details">
                       <Text weight="bold" size="4">{asset.name}</Text>
                       <Text>{asset.description}</Text>
-                      <Text>Price: {asset.price} SUI</Text>
+                      <Text>Price: {Number(asset.price) < 100000 ? `${Number(asset.price)}` + " MIST" : `${Number(asset.price) / Number(MIST_PER_SUI)}` + " SUI"}</Text>
                       <Text>Tags: {asset.tags.join(', ')}</Text>
                       {hasUserPurchased(asset) ? (
-                        <Button 
+                        <Button
                           onClick={() => window.location.href = `/purchases`}
                         >
                           View in My Purchases
                         </Button>
                       ) : (
-                        <Button 
+                        <Button
                           onClick={() => handlePurchase(asset)}
                           disabled={purchaseStatus[asset.id]?.startsWith('Processing')}
                         >
@@ -190,15 +190,15 @@ export function StorePage() {
               )}
 
               <Flex justify="between" align="center">
-                <Button 
-                  disabled={page === 1} 
+                <Button
+                  disabled={page === 1}
                   onClick={() => setPage(p => p - 1)}
                 >
                   Previous
                 </Button>
                 <Text>Page {page} of {totalPages}</Text>
-                <Button 
-                  disabled={page === totalPages} 
+                <Button
+                  disabled={page === totalPages}
                   onClick={() => setPage(p => p + 1)}
                 >
                   Next

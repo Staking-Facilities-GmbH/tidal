@@ -49,9 +49,9 @@ export function EncryptedUpload({ initialAsset, onClose, showAssetList = true }:
       }),
   });
   const account = useCurrentAccount();
-  const [purchaseStatus, setPurchaseStatus] = useState<{[assetId: string]: string}>({});
-  const [downloadStatus, setDownloadStatus] = useState<{[assetId: string]: string}>({});
-  const [downloading, setDownloading] = useState<{[assetId: string]: boolean}>({});
+  const [purchaseStatus, setPurchaseStatus] = useState<{ [assetId: string]: string }>({});
+  const [downloadStatus, setDownloadStatus] = useState<{ [assetId: string]: string }>({});
+  const [downloading, setDownloading] = useState<{ [assetId: string]: boolean }>({});
   const [userPurchases, setUserPurchases] = useState<string[]>([]);
   const { mutate: signPersonalMessage } = useSignPersonalMessage();
   const [currentSessionKey, setCurrentSessionKey] = useState<SessionKey | null>(null);
@@ -162,7 +162,7 @@ export function EncryptedUpload({ initialAsset, onClose, showAssetList = true }:
             const asset = {
               name,
               description,
-              price: Number(price),
+              price: Number(fee),
               tags: tags.split(',').map(t => t.trim()).filter(Boolean),
               file_url: uploadedBlobInfo.blobUrl,
               creator_address: account?.address || '',
@@ -272,7 +272,7 @@ export function EncryptedUpload({ initialAsset, onClose, showAssetList = true }:
       // First split a coin with the exact fee amount
       const tx = new Transaction();
       const [coin] = tx.splitCoins(tx.gas, [tx.pure.u64(fee)]);
-      
+
       // Then call add with the coin
       tx.moveCall({
         target: `${packageId}::tidal::add`,
@@ -446,11 +446,11 @@ export function EncryptedUpload({ initialAsset, onClose, showAssetList = true }:
 
       try {
         // Fetch keys first
-        await sealClient.fetchKeys({ 
-          ids: [id], 
-          txBytes, 
+        await sealClient.fetchKeys({
+          ids: [id],
+          txBytes,
           sessionKey,
-          threshold: 2 
+          threshold: 2
         });
 
         // Then decrypt
@@ -494,7 +494,7 @@ export function EncryptedUpload({ initialAsset, onClose, showAssetList = true }:
           {!asset && (
             <>
               <Text size="5" weight="bold">Add a 3D Asset</Text>
-              
+
               <label htmlFor="asset-name">Asset Name</label>
               <input
                 id="asset-name"
@@ -532,18 +532,18 @@ export function EncryptedUpload({ initialAsset, onClose, showAssetList = true }:
                 onChange={(e: ChangeEvent<HTMLInputElement>) => setFee(e.target.value)}
               />
 
-              <Button 
-                disabled={isCreating || !name || !fee} 
+              <Button
+                disabled={isCreating || !name || !fee}
                 onClick={handleCreateAllowlist}
               >
                 {isCreating ? 'Creating...' : 'Create Access List'}
               </Button>
 
               {allowlistId && capId && (
-                <WalrusUpload 
-                  policyObject={allowlistId.startsWith('0x') ? allowlistId : `0x${allowlistId}`} 
-                  cap_id={capId} 
-                  onBlobUploaded={handleBlobUploaded} 
+                <WalrusUpload
+                  policyObject={allowlistId.startsWith('0x') ? allowlistId : `0x${allowlistId}`}
+                  cap_id={capId}
+                  onBlobUploaded={handleBlobUploaded}
                 />
               )}
 
@@ -577,7 +577,7 @@ export function EncryptedUpload({ initialAsset, onClose, showAssetList = true }:
           <Card>
             <Flex direction="column" gap="4">
               <Text size="5" weight="bold">Asset List</Text>
-              
+
               <input
                 className="radix-themes"
                 placeholder="Filter by name"
@@ -600,7 +600,6 @@ export function EncryptedUpload({ initialAsset, onClose, showAssetList = true }:
                 <Text>Loading assets...</Text>
               ) : (
                 <Flex direction="column" gap="2">
-                  {console.log('[AssetList DEBUG] assetList:', assetList)}
                   {assetList.map((asset) => {
                     console.log('[AssetList DEBUG]', asset);
                     return (
@@ -616,14 +615,14 @@ export function EncryptedUpload({ initialAsset, onClose, showAssetList = true }:
                           <Text>Price: {asset.price}</Text>
                           <Text>Tags: {asset.tags.join(', ')}</Text>
                           {hasUserPurchased(asset) ? (
-                            <Button 
-                              disabled={downloading[asset.id]} 
+                            <Button
+                              disabled={downloading[asset.id]}
                               onClick={() => handleDownload(asset)}
                             >
                               {downloadStatus[asset.id] || 'Download'}
                             </Button>
                           ) : (
-                            <Button 
+                            <Button
                               onClick={() => handlePurchase(asset)}
                             >
                               {purchaseStatus[asset.id] || 'Purchase'}
@@ -639,15 +638,15 @@ export function EncryptedUpload({ initialAsset, onClose, showAssetList = true }:
                   )}
 
                   <Flex justify="between" align="center">
-                    <Button 
-                      disabled={page === 1} 
+                    <Button
+                      disabled={page === 1}
                       onClick={() => setPage(p => p - 1)}
                     >
                       Previous
                     </Button>
                     <Text>Page {page} of {totalPages}</Text>
-                    <Button 
-                      disabled={page === totalPages} 
+                    <Button
+                      disabled={page === totalPages}
                       onClick={() => setPage(p => p + 1)}
                     >
                       Next
