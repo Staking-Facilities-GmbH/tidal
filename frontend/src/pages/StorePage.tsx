@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Card, Flex, Text, Button, Box } from '@radix-ui/themes';
+import { Card, Flex, Text, Button, Box, Popover } from '@radix-ui/themes';
 import { supabase } from '../utils/supabase';
 import { useCurrentAccount, useSuiClient, useSignAndExecuteTransaction } from '@mysten/dapp-kit';
 import { Transaction } from '@mysten/sui/transactions';
@@ -15,7 +15,8 @@ export function StorePage() {
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [filterName, setFilterName] = useState('');
-  const [filterTag, setFilterTag] = useState('');
+  const [availableTags, setAvailableTags] = useState<string[]>([]);
+  const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [userPurchases, setUserPurchases] = useState<string[]>([]);
   const [purchaseStatus, setPurchaseStatus] = useState<{ [assetId: string]: string }>({});
   const account = useCurrentAccount();
@@ -45,6 +46,19 @@ export function StorePage() {
     }
   };
 
+  // Fetch available tags
+  const fetchAvailableTags = async () => {
+    const { data, error } = await supabase
+      .from('assets')
+      .select('tags');
+
+    if (!error && data) {
+      const allTags = data.flatMap(asset => asset.tags || []);
+      const uniqueTags = [...new Set(allTags)].sort();
+      setAvailableTags(uniqueTags);
+    }
+  };
+
   // Fetch assets
   const fetchAssets = async () => {
     setAssetLoading(true);
@@ -53,8 +67,8 @@ export function StorePage() {
     if (filterName) {
       query = query.ilike('name', `%${filterName}%`);
     }
-    if (filterTag) {
-      query = query.contains('tags', [filterTag]);
+    if (selectedTags.length > 0) {
+      query = query.contains('tags', selectedTags);
     }
     query = query.range((page - 1) * PAGE_SIZE, page * PAGE_SIZE - 1);
     const { data, error, count } = await query;
@@ -70,8 +84,12 @@ export function StorePage() {
   };
 
   useEffect(() => {
+    fetchAvailableTags();
+  }, []);
+
+  useEffect(() => {
     fetchAssets();
-  }, [page, filterName, filterTag, account?.address]);
+  }, [page, filterName, selectedTags, account?.address]);
 
   // Helper: check if user has purchased asset
   const hasUserPurchased = (asset: any) => userPurchases.includes(asset.id);
@@ -134,18 +152,97 @@ export function StorePage() {
           <Text size="5" weight="bold">Asset Store</Text>
 
           <input
-            className="radix-themes"
+            className="radix-themes w-[200px]"
             placeholder="Filter by name"
             value={filterName}
             onChange={(e) => setFilterName(e.target.value)}
           />
 
-          <input
-            className="radix-themes"
-            placeholder="Filter by tag"
-            value={filterTag}
-            onChange={(e) => setFilterTag(e.target.value)}
-          />
+          <Popover.Root>
+            <Popover.Trigger>
+              <Button
+                variant="soft"
+                style={{
+                  justifyContent: 'flex-start',
+                  width: 'fit-content',
+                  height: '32px',
+                  transform: 'none'
+                }}
+              >
+                Select tags to filter {selectedTags.length > 0 && `(${selectedTags.length})`}
+              </Button>
+            </Popover.Trigger>
+            <Popover.Content>
+              <Flex direction="column" gap="2" style={{ maxHeight: '300px', overflowY: 'auto' }}>
+                {selectedTags.length > 0 && (
+                  <div
+                    onClick={() => setSelectedTags([])}
+                    style={{
+                      padding: '8px',
+                      cursor: 'pointer',
+                      width: '100%',
+                      backgroundColor: 'transparent',
+                      transition: 'background-color 0.2s',
+                      borderBottom: '1px solid var(--gray-5)',
+                      marginBottom: '4px'
+                    }}
+                    onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--gray-3)'}
+                    onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
+                  >
+                    <Flex align="center" gap="2">
+                      <Text color="red">Clear filters</Text>
+                    </Flex>
+                  </div>
+                )}
+                {availableTags.map((tag) => (
+                  <div
+                    key={tag}
+                    onClick={() => {
+                      if (selectedTags.includes(tag)) {
+                        setSelectedTags(selectedTags.filter(t => t !== tag));
+                      } else {
+                        setSelectedTags([...selectedTags, tag]);
+                      }
+                    }}
+                    style={{
+                      padding: '8px',
+                      cursor: 'pointer',
+                      width: '100%',
+                      backgroundColor: 'transparent',
+                      transition: 'background-color 0.2s'
+                    }}
+                    onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--gray-3)'}
+                    onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
+                  >
+                    <Flex align="center" gap="2">
+                      <input
+                        type="checkbox"
+                        checked={selectedTags.includes(tag)}
+                        readOnly
+                        style={{ margin: 0 }}
+                      />
+                      {tag}
+                    </Flex>
+                  </div>
+                ))}
+              </Flex>
+            </Popover.Content>
+          </Popover.Root>
+
+          {selectedTags.length > 0 && (
+            <Flex gap="2" wrap="wrap">
+              {selectedTags.map((tag) => (
+                <Button
+                  key={tag}
+                  size="1"
+                  variant="soft"
+                  onClick={() => setSelectedTags(selectedTags.filter(t => t !== tag))}
+                >
+                  {tag} ×
+                </Button>
+              ))}
+            </Flex>
+          )}
 
           {assetError && (
             <Text color="red">{assetError}</Text>
@@ -167,13 +264,14 @@ export function StorePage() {
                       <Text>Price: {Number(asset.price) < 100000 ? `${Number(asset.price)}` + " MIST" : `${Number(asset.price) / Number(MIST_PER_SUI)}` + " SUI"}</Text>
                       <Text>Tags: {asset.tags.join(', ')}</Text>
                       {hasUserPurchased(asset) ? (
-                        <Button
+                        <Button style={{ transform: 'none' }}
                           onClick={() => window.location.href = `/purchases`}
                         >
                           View in My Purchases
                         </Button>
                       ) : (
                         <Button
+                          style={{ transform: 'none' }}
                           onClick={() => handlePurchase(asset)}
                           disabled={purchaseStatus[asset.id]?.startsWith('Processing')}
                         >
