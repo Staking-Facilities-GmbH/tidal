@@ -16,9 +16,26 @@ export async function generate360Gif(file: File): Promise<Blob> {
     const height = 256;
     const renderer = new THREE.WebGLRenderer({ antialias: true, preserveDrawingBuffer: true });
     renderer.setSize(width, height);
-    renderer.setClearColor(0xffffff, 1);
+    
+    // Create gradient background
+    const canvas = document.createElement('canvas');
+    canvas.width = 2;
+    canvas.height = 2;
+    const context = canvas.getContext('2d');
+    if (context) {
+      const gradient = context.createLinearGradient(0, 0, 0, 2);
+      gradient.addColorStop(0, '#b7f1ff');   // Top color
+      gradient.addColorStop(1, '#0F97FB');   // Bottom color
+      context.fillStyle = gradient;
+      context.fillRect(0, 0, 2, 2);
+    }
+    const texture = new THREE.CanvasTexture(canvas);
+    texture.needsUpdate = true;
+
     // Create scene
     const scene = new THREE.Scene();
+    scene.background = texture;
+    
     // Add light
     const light = new THREE.DirectionalLight(0xffffff, 1);
     light.position.set(1, 1, 1);
@@ -57,7 +74,7 @@ export async function generate360Gif(file: File): Promise<Blob> {
           camera.position.z = Math.cos(angle) * cameraDistance;
           camera.lookAt(new THREE.Vector3(0, 0, 0));
           renderer.render(scene, camera);
-          gif.addFrame(renderer.domElement, { delay: 50, copy: true });
+          gif.addFrame(renderer.domElement, { delay: 100, copy: true });
         }
         gif.on('finished', (blob: Blob) => {
           renderer.dispose();

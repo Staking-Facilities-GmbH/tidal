@@ -1,7 +1,36 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Box, Flex, Card, Text, Button, Avatar } from '@radix-ui/themes';
+import { supabase } from '../utils/supabase';
+
 
 export function LandingPage() {
+  const [exploreAssets, setExploreAssets] = useState<any[]>([]);
+  const [exploreLoading, setExploreLoading] = useState(false);
+  const [tagGroups, setTagGroups] = useState<{ tag: string, assets: any[] }[]>([]);
+
+  useEffect(() => {
+    const fetchAssets = async () => {
+      setExploreLoading(true);
+      const { data, error } = await supabase.from('assets').select('*');
+      const assets = error ? [] : data || [];
+      setExploreAssets(assets);
+      // Group by tag
+      const tagMap: { [tag: string]: any[] } = {};
+      assets.forEach(asset => {
+        (asset.tags || []).forEach((tag: string) => {
+          if (!tagMap[tag]) tagMap[tag] = [];
+          tagMap[tag].push(asset);
+        });
+      });
+      const groups = Object.entries(tagMap)
+        .sort((a, b) => b[1].length - a[1].length) // most items first
+        .map(([tag, assets]) => ({ tag, assets }));
+      setTagGroups(groups);
+      setExploreLoading(false);
+    };
+    fetchAssets();
+  }, []);
+
   return (
     <Box className="landing-root" style={{ maxWidth: 1200, margin: '0 auto', padding: '0 16px', minHeight: '100vh' }}>
       {/* Hero Section - Responsive */}
@@ -159,7 +188,7 @@ export function LandingPage() {
                 height: 32,
                 filter: 'brightness(1.1)',
                 opacity: 0.95,
-                paddingTop: p === 'seal' ? 12 : 0,
+                paddingTop: p === 'seal' ? 4 : 0,
               }}
             />
           ))}
@@ -172,47 +201,52 @@ export function LandingPage() {
                 height: 32,
                 filter: 'brightness(1.1)',
                 opacity: 0.95,
-                paddingTop: p === 'seal' ? 12 : 0,
+                paddingTop: p === 'seal' ? 4 : 0,
               }}
             />
           ))}
         </div>
       </Box>
 
-      {/* Popular This Week */}
-      <Box mt="8" mb="6" style={{ maxWidth: 1100, margin: '0 auto', padding: '0 8px' }}>
-        <Text as="div" size="7" weight="bold" align="center" mb="4">Popular this <span style={{
+
+      {/* Explore Assets */}
+      <Box mt="8" mb="8" style={{ maxWidth: 1100, margin: '0 auto', padding: '0 8px' }}>
+        <Text as="div" size="8" weight="bold" align="center" mb="4">Explore <span style={{
               background: 'linear-gradient(0deg, #137DFA 0%, #00eaff 100%)',
               WebkitBackgroundClip: 'text',
               WebkitTextFillColor: 'transparent',
               backgroundClip: 'text',
               color: 'transparent',
               display: 'inline-block',
-            }}>week</span></Text>
-        <Flex justify="center" gap="5" wrap="wrap">
-          {[1,2,3,4,5].map(i => (
-            <Card key={i} style={{ background: 'rgba(30, 32, 60, 0.8)', minWidth: 180, maxWidth: 220, textAlign: 'center', margin: 8, flex: '1 1 180px' }}>
-              <img src={`/popular${i}.jpg`} alt="Popular Art" style={{ borderRadius: 16, width: '100%', marginBottom: 12 }} />
-              <Text weight="bold">Artwork {i}</Text>
-              <Text size="2" style={{ color: '#b0b3c6' }}>by Artist {i}</Text>
-              <Text size="2" style={{ color: '#b0b3c6' }}>2.45 ETH • 50k</Text>
-            </Card>
-          ))}
-        </Flex>
-      </Box>
-
-
-      {/* Explore Artworks */}
-      <Box mt="8" mb="8" style={{ maxWidth: 1100, margin: '0 auto', padding: '0 8px' }}>
-        <Text as="div" size="6" weight="bold" align="center" mb="4">Explore Artworks</Text>
-        <Flex justify="center" gap="4" wrap="wrap">
-          {['Abstract', '3D Art', 'Modern Art', 'Sci-Fi', 'Pop', 'Surreal', 'Fantasy', 'Nature'].map((cat, i) => (
-            <Card key={cat} style={{ background: 'rgba(30, 32, 60, 0.8)', minWidth: 180, maxWidth: 220, textAlign: 'center', margin: 8, flex: '1 1 180px' }}>
-              <img src={`/explore${i+1}.jpg`} alt={cat} style={{ borderRadius: 12, width: '100%', marginBottom: 8 }} />
-              <Text weight="bold">{cat}</Text>
-            </Card>
-          ))}
-        </Flex>
+            }}>Assets</span></Text>
+        {exploreLoading ? (
+          <Text align="center">Loading artworks...</Text>
+        ) : (
+          <Flex justify="center" gap="4" wrap="wrap">
+            {tagGroups.slice(0, 5).map(group => (
+              <Card key={group.tag} style={{ background: 'rgba(30, 32, 60, 0.8)', minWidth: 260, maxWidth: 320, textAlign: 'left', margin: 8, flex: '1 1 260px', borderRadius: 18, overflow: 'hidden', position: 'relative', boxShadow: '0 2px 16px #137dfa33' }}>
+                <Flex direction="column" style={{ height: 180, gap: 0, marginBottom: 8 }}>
+                  <Flex style={{ flex: 1, gap: 2 }}>
+                    {group.assets.slice(0, 2).map((a, i) => (
+                      <img key={a.id + '-top'} src={a.preview_gif_url || a.image_url || '/explore1.jpg'} alt={a.name} style={{ width: '50%', height: 60, objectFit: 'cover', borderRadius: i === 0 ? '12px 0 0 0' : '0 12px 0 0' }} />
+                    ))}
+                  </Flex>
+                  <Flex style={{ flex: 1, gap: 2 }}>
+                    {group.assets.slice(2, 4).map((a, i) => (
+                      <img key={a.id + '-bot'} src={a.preview_gif_url || a.image_url || '/explore2.jpg'} alt={a.name} style={{ width: '50%', height: 60, objectFit: 'cover', borderRadius: i === 0 ? '0 0 0 12px' : '0 0 12px 0' }} />
+                    ))}
+                  </Flex>
+                </Flex>
+                <Flex align="center" justify="between" style={{ padding: '0 12px 8px 12px' }}>
+                  <Text weight="bold" size="4">{group.tag}</Text>
+                  <Box style={{ background: 'linear-gradient(90deg, #137DFA 0%, #00eaff 100%)', color: '#fff', borderRadius: 8, fontSize: 14, fontWeight: 600, padding: '2px 12px', marginLeft: 8 }}>
+                    {group.assets.length} Items
+                  </Box>
+                </Flex>
+              </Card>
+            ))}
+          </Flex>
+        )}
       </Box>
     </Box>
   );
