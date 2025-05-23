@@ -47,8 +47,7 @@ entry fun create_allowlist_entry(fee: u64, name: String, ctx: &mut TxContext) {
     transfer::transfer(create_allowlist(fee, name, ctx), ctx.sender());
 }
 
-public fun add(fee: Coin<SUI>, allowlist: &mut Allowlist, cap: &Cap, account: address) {
-    assert!(cap.allowlist_id == object::id(allowlist), EInvalidCap);
+public fun add(fee: Coin<SUI>, allowlist: &mut Allowlist, account: address) {
     assert!(fee.value() == allowlist.fee, EInvalidFee);
     assert!(!allowlist.list.contains(&account), EDuplicate); // this won't work with Soulbound NFTs
 
