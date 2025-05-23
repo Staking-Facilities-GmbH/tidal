@@ -12,8 +12,6 @@ Tidal is a decentralized platform for trading digital assets built on the Sui bl
 - [Getting Started](#getting-started)
 - [Development](#development)
 - [Deployment](#deployment)
-- [Security](#security)
-- [API Documentation](#api-documentation)
 - [Contributing](#contributing)
 - [License](#license)
 
@@ -191,7 +189,7 @@ SEAL_API_KEY=your_seal_key
     supabase link --project-ref <project_ref>
   ```
 
-3. Rund the migration scripts
+3. Run the migration scripts
   ```bash
     supabase db push
   ```
@@ -231,17 +229,6 @@ You can find these values in:
 - Project URL: `https://<project-id>.supabase.co`
 - anon/public key: `eyJ...` (starts with eyJ)
 
-### 6. Initialize Supabase Client
-
-Create `frontend/src/utils/supabase.ts`:
-```typescript
-import { createClient } from '@supabase/supabase-js';
-
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
-const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
-
-export const supabase = createClient(supabaseUrl, supabaseAnonKey);
-```
 
 ## Development
 
@@ -251,19 +238,6 @@ tidal/
 ├── frontend/          # React frontend application
 ├── move/              # Move smart contracts
 
-```
-
-### Available Scripts
-- `pnpm dev` - Start development server
-- `pnpm build` - Build for production
-- `pnpm test` - Run tests
-- `pnpm lint` - Run linter
-- `pnpm format` - Format code
-
-### Testing
-```bash
-# Run all tests
-pnpm test
 ```
 
 ## Deployment
@@ -303,26 +277,6 @@ pnpm test
    };
    ```
 
-## Security
-
-### Access Control
-- On-chain allowlists
-- Encrypted storage
-- Session-based access
-- Key server redundancy
-
-### Data Protection
-- End-to-end encryption
-- Secure key management
-- Access verification
-- Data integrity checks
-
-### Security Best Practices
-1. Always use HTTPS
-2. Implement rate limiting
-3. Regular security audits
-4. Keep dependencies updated
-5. Follow the principle of least privilege
 
 ## Contributing
 
@@ -341,13 +295,6 @@ pnpm test
 ## License
 
 This project is licensed under the Apache License 2.0 - see the [LICENSE](LICENSE) file for details.
-
-## Support
-
-For support, please:
-1. Check the [documentation](docs/)
-2. Open an issue
-3. Contact the maintainers
 
 ## Acknowledgments
 
