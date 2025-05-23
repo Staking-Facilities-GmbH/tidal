@@ -1,5 +1,5 @@
 import { WalrusUpload } from '../../EncryptAndUpload';
-import { Card, Flex, Text, Button, Box } from '@radix-ui/themes';
+import { Card, Flex, Text, Button, Box, Popover, Select, Dialog } from '@radix-ui/themes';
 import { useState, useEffect, ChangeEvent } from 'react';
 import { Transaction } from '@mysten/sui/transactions';
 import { useSignAndExecuteTransaction, useSuiClient, useCurrentAccount, useSignPersonalMessage } from '@mysten/dapp-kit';
@@ -22,7 +22,9 @@ export function EncryptedUpload({ initialAsset, onClose, showAssetList = true }:
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
   const [price, setPrice] = useState('');
-  const [tags, setTags] = useState('');
+  const [tags, setTags] = useState<string[]>([]);
+  const [availableTags, setAvailableTags] = useState<string[]>([]);
+  const [newTag, setNewTag] = useState('');
   const [fee, setFee] = useState('');
   const [isCreating, setIsCreating] = useState(false);
   const [allowlistId, setAllowlistId] = useState<string | null>(null);
@@ -58,6 +60,8 @@ export function EncryptedUpload({ initialAsset, onClose, showAssetList = true }:
   const [asset, setAsset] = useState<any | null>(null);
   const [assetId, setAssetId] = useState<string | null>(null);
   const [encryptedObjectId, setEncryptedObjectId] = useState<string | null>(null);
+  const [showNewTagDialog, setShowNewTagDialog] = useState(false);
+  const [newTagInput, setNewTagInput] = useState('');
 
   const fetchObjectsWithRetry = async (ids: string[], maxRetries = 5) => {
     for (let i = 0; i < maxRetries; i++) {
@@ -163,7 +167,7 @@ export function EncryptedUpload({ initialAsset, onClose, showAssetList = true }:
               name,
               description,
               price: Number(fee),
-              tags: tags.split(',').map(t => t.trim()).filter(Boolean),
+              tags,
               file_url: uploadedBlobInfo.blobUrl,
               creator_address: account?.address || '',
               allowlist_id: allowlistId,
@@ -487,6 +491,42 @@ export function EncryptedUpload({ initialAsset, onClose, showAssetList = true }:
     }
   };
 
+  // Fetch available tags
+  const fetchAvailableTags = async () => {
+    const { data, error } = await supabase
+      .from('assets')
+      .select('tags');
+
+    if (!error && data) {
+      const allTags = data.flatMap(asset => asset.tags || []);
+      const uniqueTags = [...new Set(allTags)].sort();
+      setAvailableTags(uniqueTags);
+    }
+  };
+
+  useEffect(() => {
+    fetchAvailableTags();
+  }, []);
+
+  const handleAddTag = (tag: string) => {
+    if (tag && !tags.includes(tag)) {
+      setTags([...tags, tag]);
+      setNewTag('');
+    }
+  };
+
+  const handleRemoveTag = (tagToRemove: string) => {
+    setTags(tags.filter(tag => tag !== tagToRemove));
+  };
+
+  const handleAddNewTag = () => {
+    if (newTagInput.trim() && !tags.includes(newTagInput.trim())) {
+      handleAddTag(newTagInput.trim());
+      setNewTagInput('');
+      setShowNewTagDialog(false);
+    }
+  };
+
   return (
     <Box p="4">
       <Card>
@@ -513,14 +553,79 @@ export function EncryptedUpload({ initialAsset, onClose, showAssetList = true }:
                 onChange={(e: ChangeEvent<HTMLInputElement>) => setDescription(e.target.value)}
               />
 
-              <label htmlFor="asset-tags">Tags (comma separated)</label>
-              <input
-                id="asset-tags"
-                className="radix-themes"
-                placeholder="Tags (comma separated)"
-                value={tags}
-                onChange={(e: ChangeEvent<HTMLInputElement>) => setTags(e.target.value)}
-              />
+              <label htmlFor="asset-tags">Tags</label>
+              <Flex direction="column" gap="2">
+                <Flex gap="2" wrap="wrap">
+                  {tags.map((tag) => (
+                    <Button
+                      key={tag}
+                      size="1"
+                      variant="soft"
+                      onClick={() => handleRemoveTag(tag)}
+                    >
+                      {tag} ×
+                    </Button>
+                  ))}
+                </Flex>
+                <Flex gap="2">
+                  <Select.Root
+                    value={newTag}
+                    onValueChange={(value) => {
+                      if (value === 'new') {
+                        setShowNewTagDialog(true);
+                      } else {
+                        handleAddTag(value);
+                      }
+                    }}
+                  >
+                    <Select.Trigger placeholder="Select or add tag" />
+                    <Select.Content position="popper" sideOffset={5}>
+                      <Select.Item value="new">+ Add New Tag</Select.Item>
+                      {availableTags
+                        .filter(tag => !tags.includes(tag))
+                        .map(tag => (
+                          <Select.Item key={tag} value={tag}>
+                            {tag}
+                          </Select.Item>
+                        ))}
+                    </Select.Content>
+                  </Select.Root>
+                </Flex>
+              </Flex>
+
+              <Dialog.Root open={showNewTagDialog} onOpenChange={setShowNewTagDialog}>
+                <Dialog.Content style={{ maxWidth: 450 }}>
+                  <Dialog.Title>Add New Tag</Dialog.Title>
+                  <Dialog.Description size="2" mb="4">
+                    Enter a new tag name
+                  </Dialog.Description>
+
+                  <Flex direction="column" gap="3">
+                    <input
+                      className="radix-themes"
+                      placeholder="Enter tag name"
+                      value={newTagInput}
+                      onChange={(e) => setNewTagInput(e.target.value)}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter') {
+                          handleAddNewTag();
+                        }
+                      }}
+                    />
+
+                    <Flex gap="3" mt="4" justify="end">
+                      <Dialog.Close>
+                        <Button variant="soft" color="gray">
+                          Cancel
+                        </Button>
+                      </Dialog.Close>
+                      <Button onClick={handleAddNewTag}>
+                        Add Tag
+                      </Button>
+                    </Flex>
+                  </Flex>
+                </Dialog.Content>
+              </Dialog.Root>
 
               <label htmlFor="asset-fee">Price (in MIST, smallest SUI denomination)</label>
               <input
