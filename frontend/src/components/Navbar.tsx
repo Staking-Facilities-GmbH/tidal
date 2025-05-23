@@ -1,8 +1,10 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { ConnectButton } from '@mysten/dapp-kit';
 
 export function Navbar({ user }: { user?: string }) {
+  const location = useLocation();
+  const currentPath = location.pathname;
   return (
     <header>
       <nav
@@ -25,6 +27,23 @@ export function Navbar({ user }: { user?: string }) {
           </Link>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+          <div style={{ display: 'flex', gap: '1.5rem', marginRight: '1.5rem' }}>
+            {currentPath !== '/marketplace' && (
+              <Link to="/marketplace">
+                <button className="nav-btn" style={{ background: 'none', border: 'none', color: 'var(--color-text)', fontWeight: 600, fontSize: 16, cursor: 'pointer', padding: '6px 1px', borderRadius: 8, boxShadow: 'none' }}>Marketplace</button>
+              </Link>
+            )}
+            {currentPath !== '/create' && (
+              <Link to="/create">
+                <button className="nav-btn" style={{ background: 'none', border: 'none', color: 'var(--color-text)', fontWeight: 600, fontSize: 16, cursor: 'pointer', padding: '6px 1px', borderRadius: 8, boxShadow: 'none' }}>Create Asset</button>
+              </Link>
+            )}
+            {currentPath !== '/purchases' && (
+              <Link to="/purchases">
+                <button className="nav-btn" style={{ background: 'none', border: 'none', color: 'var(--color-text)', fontWeight: 600, fontSize: 16, cursor: 'pointer', padding: '6px 1px', borderRadius: 8, boxShadow: 'none' }}>My Purchases</button>
+              </Link>
+            )}
+          </div>
           <ConnectButton style={{
             background: 'linear-gradient(90deg,rgb(13, 110, 221) 0%,rgb(51, 184, 241) 100%)',
             color: '#fff',

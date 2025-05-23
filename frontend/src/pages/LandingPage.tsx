@@ -1,12 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import { Box, Flex, Card, Text, Button, Avatar } from '@radix-ui/themes';
 import { supabase } from '../utils/supabase';
+import { useNavigate } from 'react-router-dom';
 
 
 export function LandingPage() {
   const [exploreAssets, setExploreAssets] = useState<any[]>([]);
   const [exploreLoading, setExploreLoading] = useState(false);
   const [tagGroups, setTagGroups] = useState<{ tag: string, assets: any[] }[]>([]);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchAssets = async () => {
@@ -67,7 +69,7 @@ export function LandingPage() {
               color: 'transparent',
               display: 'inline-block',
             }}>12k</span></Text>
-              <Text size="3" style={{ color: '#FFFFFF', display: 'block' }}>Collectibles</Text>
+              <Text size="3" style={{ color: '#FFFFFF', display: 'block' }}>3D assets</Text>
             </Box>
             <Box style={{ width: 1, height: 32, background: 'rgba(255,255,255,0.15)', borderRadius: 1 }} />
             <Box style={{ textAlign: 'left' }}>
@@ -78,8 +80,8 @@ export function LandingPage() {
               backgroundClip: 'text',
               color: 'transparent',
               display: 'inline-block',
-            }}>36k</span></Text>
-              <Text size="3" style={{ color: '#FFFFFF', display: 'block' }}>Auctions</Text>
+            }}>100+</span></Text>
+              <Text size="3" style={{ color: '#FFFFFF', display: 'block' }}>Trades</Text>
             </Box>
             <Box style={{ width: 1, height: 32, background: 'rgba(255,255,255,0.15)', borderRadius: 1 }} />
             <Box style={{ textAlign: 'left' }}>
@@ -90,8 +92,8 @@ export function LandingPage() {
               backgroundClip: 'text',
               color: 'transparent',
               display: 'inline-block',
-            }}>57k</span></Text>
-              <Text size="3" style={{ color: '#FFFFFF', display: 'block' }}>NFT Artist</Text>
+            }}>57</span></Text>
+              <Text size="3" style={{ color: '#FFFFFF', display: 'block' }}>3D Artist</Text>
             </Box>
           </Flex>
         </Box>
@@ -255,6 +257,7 @@ export function LandingPage() {
                   (e.currentTarget as HTMLDivElement).style.transform = '';
                   (e.currentTarget as HTMLDivElement).style.boxShadow = '0 2px 16px #137dfa33';
                 }}
+                onClick={() => navigate('/marketplace')}
               >
                 <div style={{
                   display: 'grid',

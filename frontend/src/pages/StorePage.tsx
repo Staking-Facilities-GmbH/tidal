@@ -20,6 +20,7 @@ export function StorePage() {
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [userPurchases, setUserPurchases] = useState<string[]>([]);
   const [purchaseStatus, setPurchaseStatus] = useState<{ [assetId: string]: string }>({});
+  const [errorPopup, setErrorPopup] = useState<{ open: boolean, message: string }>({ open: false, message: '' });
   const account = useCurrentAccount();
   const packageId = useNetworkVariable('packageId');
   const suiClient = useSuiClient();
@@ -133,16 +134,19 @@ export function StorePage() {
               ]);
               fetchAssets();
             } else {
-              setPurchaseStatus(s => ({ ...s, [asset.id]: 'Purchase failed: ' + (result.effects?.status?.error || 'Unknown error') }));
+              setPurchaseStatus(s => ({ ...s, [asset.id]: '' }));
+              setErrorPopup({ open: true, message: 'Purchase failed: ' + (result.effects?.status?.error || 'Unknown error') });
             }
           },
           onError: (error) => {
-            setPurchaseStatus(s => ({ ...s, [asset.id]: 'Purchase failed: ' + error.message }));
+            setPurchaseStatus(s => ({ ...s, [asset.id]: '' }));
+            setErrorPopup({ open: true, message: 'Purchase failed: ' + error.message });
           },
         }
       );
     } catch (e: any) {
-      setPurchaseStatus(s => ({ ...s, [asset.id]: 'Purchase failed: ' + e.message }));
+      setPurchaseStatus(s => ({ ...s, [asset.id]: '' }));
+      setErrorPopup({ open: true, message: 'Purchase failed: ' + e.message });
     }
   };
 
@@ -400,7 +404,7 @@ export function StorePage() {
                           onClick={() => handlePurchase(asset)}
                           disabled={purchaseStatus[asset.id]?.startsWith('Processing')}
                         >
-                          {purchaseStatus[asset.id] || 'Buy'}
+                          {purchaseStatus[asset.id]?.startsWith('Processing') ? 'Processing...' : 'Buy'}
                         </Button>
                       )}
                     </div>
@@ -442,6 +446,57 @@ export function StorePage() {
             </Flex>
           )}
         </Flex>
+
+        {/* Error Popup */}
+        {errorPopup.open && (
+          <div style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            width: '100vw',
+            height: '100vh',
+            background: 'rgba(0,0,0,0.25)',
+            zIndex: 1000,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+          }}
+            onClick={() => setErrorPopup({ open: false, message: '' })}
+          >
+            <div style={{
+              background: 'rgba(30, 32, 60, 0.98)',
+              borderRadius: 16,
+              padding: '32px 28px',
+              minWidth: 320,
+              maxWidth: '90vw',
+              boxShadow: '0 4px 32px #137dfa55',
+              border: '1.5px solid #00eaff44',
+              color: '#fff',
+              fontSize: 18,
+              textAlign: 'center',
+              position: 'relative',
+            }}
+              onClick={e => e.stopPropagation()}
+            >
+              <div style={{ marginBottom: 18, fontWeight: 600, fontSize: 20, color: '#00eaff' }}>Purchase Error</div>
+              <div style={{ marginBottom: 18 }}>{errorPopup.message}</div>
+              <Button
+                style={{
+                  background: 'linear-gradient(90deg, #137DFA 0%, #00eaff 100%)',
+                  color: '#fff',
+                  borderRadius: 12,
+                  fontWeight: 700,
+                  fontSize: 16,
+                  marginTop: 8,
+                  width: '100%',
+                }}
+                onClick={() => setErrorPopup({ open: false, message: '' })}
+              >
+                Close
+              </Button>
+            </div>
+          </div>
+        )}
     </Box>
   );
 } 
