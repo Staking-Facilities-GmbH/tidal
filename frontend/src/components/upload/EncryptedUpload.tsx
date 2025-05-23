@@ -533,7 +533,6 @@ export function EncryptedUpload({ initialAsset, onClose, showAssetList = true }:
         <Flex direction="column" gap="4">
           {!asset && (
             <>
-              <Text size="5" weight="bold">Add a 3D Asset</Text>
 
               <label htmlFor="asset-name">Asset Name</label>
               <input
