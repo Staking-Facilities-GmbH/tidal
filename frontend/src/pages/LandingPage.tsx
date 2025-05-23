@@ -37,7 +37,7 @@ export function LandingPage() {
       <Flex className="landing-hero" p="8" style={{ minHeight: 420, alignItems: 'center', justifyContent: 'center', gap: 64, flexWrap: 'wrap', flexDirection: 'row' }}>
         {/* Left Side: Text & Stats */}
         <Box style={{ flex: 1, maxWidth: 520, minWidth: 280, marginBottom: 32 }}>
-          <Text as="div" size="8" weight="bold" style={{ letterSpacing: '0.04em', marginBottom: 16, textAlign: 'left', lineHeight: 1.1 }}>
+          <Text as="div" size="9" weight="bold" style={{ letterSpacing: '0.04em', marginBottom: 16, textAlign: 'left', lineHeight: 1.1 }}>
             THE <br />
             NEW  <span style={{
               background: 'linear-gradient(0deg, #137DFA 0%, #00eaff 100%)',
@@ -52,7 +52,9 @@ export function LandingPage() {
           <Text as="p" size="4" style={{ color: '#b0b3c6', marginBottom: 32, textAlign: 'left' }}>
             Truly Own Your In-Game Digital Assets and Share it With The World
           </Text>
-          <Button size="4" style={{ background: 'linear-gradient(90deg, #7b2ff2, #f357a8)', color: '#fff', fontWeight: 700, borderRadius: 32, padding: '0 2.5rem', marginBottom: 40 }}>
+          <Button size="4" style={{ background: 'linear-gradient(90deg, #137DFA,rgb(77, 163, 197))', color: '#fff', fontWeight: 700, borderRadius: 32, padding: '0 2.5rem', marginBottom: 40 }} onClick={() => {
+            window.location.href = '/marketplace';
+          }}>
             Explore Now
           </Button>
           <Flex gap="8" mt="6" align="center">
@@ -211,7 +213,7 @@ export function LandingPage() {
 
       {/* Explore Assets */}
       <Box mt="8" mb="8" style={{ maxWidth: 1100, margin: '0 auto', padding: '0 8px' }}>
-        <Text as="div" size="8" weight="bold" align="center" mb="4">Explore <span style={{
+        <Text as="div" size="9" weight="bold" align="center" mb="8">Explore <span style={{
               background: 'linear-gradient(0deg, #137DFA 0%, #00eaff 100%)',
               WebkitBackgroundClip: 'text',
               WebkitTextFillColor: 'transparent',
@@ -222,30 +224,107 @@ export function LandingPage() {
         {exploreLoading ? (
           <Text align="center">Loading artworks...</Text>
         ) : (
-          <Flex justify="center" gap="4" wrap="wrap">
-            {tagGroups.slice(0, 5).map(group => (
-              <Card key={group.tag} style={{ background: 'rgba(30, 32, 60, 0.8)', minWidth: 260, maxWidth: 320, textAlign: 'left', margin: 8, flex: '1 1 260px', borderRadius: 18, overflow: 'hidden', position: 'relative', boxShadow: '0 2px 16px #137dfa33' }}>
-                <Flex direction="column" style={{ height: 180, gap: 0, marginBottom: 8 }}>
-                  <Flex style={{ flex: 1, gap: 2 }}>
-                    {group.assets.slice(0, 2).map((a, i) => (
-                      <img key={a.id + '-top'} src={a.preview_gif_url || a.image_url || '/explore1.jpg'} alt={a.name} style={{ width: '50%', height: 60, objectFit: 'cover', borderRadius: i === 0 ? '12px 0 0 0' : '0 12px 0 0' }} />
-                    ))}
-                  </Flex>
-                  <Flex style={{ flex: 1, gap: 2 }}>
-                    {group.assets.slice(2, 4).map((a, i) => (
-                      <img key={a.id + '-bot'} src={a.preview_gif_url || a.image_url || '/explore2.jpg'} alt={a.name} style={{ width: '50%', height: 60, objectFit: 'cover', borderRadius: i === 0 ? '0 0 0 12px' : '0 0 12px 0' }} />
-                    ))}
-                  </Flex>
-                </Flex>
-                <Flex align="center" justify="between" style={{ padding: '0 12px 8px 12px' }}>
-                  <Text weight="bold" size="4">{group.tag}</Text>
-                  <Box style={{ background: 'linear-gradient(90deg, #137DFA 0%, #00eaff 100%)', color: '#fff', borderRadius: 8, fontSize: 14, fontWeight: 600, padding: '2px 12px', marginLeft: 8 }}>
-                    {group.assets.length} Items
-                  </Box>
-                </Flex>
-              </Card>
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))',
+            gap: '32px',
+            justifyContent: 'center',
+            alignItems: 'stretch',
+          }}>
+            {tagGroups.slice(0, 3).map(group => (
+              <div
+                key={group.tag}
+                style={{
+                  background: 'rgba(30, 32, 60, 0.92)',
+                  borderRadius: 18,
+                  boxShadow: '0 2px 16px #137dfa33',
+                  padding: 20,
+                  display: 'flex',
+                  flexDirection: 'column',
+                  minHeight: 280,
+                  transition: 'transform 0.15s, box-shadow 0.15s',
+                  cursor: 'pointer',
+                  position: 'relative',
+                  border: '1.5px solid rgba(19,125,250,0.08)',
+                }}
+                onMouseOver={e => {
+                  (e.currentTarget as HTMLDivElement).style.transform = 'translateY(-4px) scale(1.025)';
+                  (e.currentTarget as HTMLDivElement).style.boxShadow = '0 6px 32px #137dfa55';
+                }}
+                onMouseOut={e => {
+                  (e.currentTarget as HTMLDivElement).style.transform = '';
+                  (e.currentTarget as HTMLDivElement).style.boxShadow = '0 2px 16px #137dfa33';
+                }}
+              >
+                <div style={{
+                  display: 'grid',
+                  gridTemplateColumns: '1fr 1fr',
+                  gridTemplateRows: '1fr 1fr',
+                  gap: 8,
+                  marginBottom: 18,
+                  minHeight: 120,
+                }}>
+                  {[0,1,2,3].map(i => {
+                    const a = group.assets[i];
+                    return (
+                      <div key={a ? a.id : i} style={{
+                        background: 'rgba(20,24,34,0.7)',
+                        borderRadius: 10,
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        minHeight: 60,
+                        minWidth: 60,
+                        aspectRatio: '1/1',
+                        overflow: 'hidden',
+                        border: '1px solid rgba(19,125,250,0.07)',
+                      }}>
+                        {a && (a.preview_gif_url || a.image_url) ? (
+                          <img
+                            src={a.preview_gif_url || a.image_url}
+                            alt={a.name}
+                            style={{
+                              width: '100%',
+                              height: '100%',
+                              objectFit: 'contain',
+                              background: '#181c2a',
+                              borderRadius: 10,
+                              display: 'block',
+                            }}
+                            onError={e => {
+                              (e.currentTarget as HTMLImageElement).src = '/explore1.jpg';
+                            }}
+                          />
+                        ) : (
+                          <span style={{ color: '#8a8fa3', fontSize: 18 }}>—</span>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+                <div style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  marginTop: 'auto',
+                  paddingTop: 8,
+                }}>
+                  <span style={{ fontWeight: 700, fontSize: 20, color: '#fff', letterSpacing: 0.5 }}>{group.tag}</span>
+                  <span style={{
+                    background: 'linear-gradient(90deg, #137DFA 0%, #00eaff 100%)',
+                    color: '#fff',
+                    borderRadius: 12,
+                    fontSize: 14,
+                    fontWeight: 600,
+                    padding: '4px 16px',
+                    marginLeft: 8,
+                    boxShadow: '0 2px 8px #00eaff33',
+                    display: 'inline-block',
+                  }}>{group.assets.length} Items</span>
+                </div>
+              </div>
             ))}
-          </Flex>
+          </div>
         )}
       </Box>
     </Box>

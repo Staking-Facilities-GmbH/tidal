@@ -8,6 +8,7 @@ import { StorePage } from './pages/StorePage';
 import { CreateAssetPage } from './pages/CreateAssetPage';
 import { UserPurchasesPage } from './pages/UserPurchasesPage';
 import { Navbar } from './components/Navbar';
+import { Footer } from './components/Footer';
 import { LandingPage } from './pages/LandingPage';
 
 function App() {
@@ -47,7 +48,9 @@ function App() {
           <Route path="/purchases" element={<UserPurchasesPage />} />
         </Routes>
       </Box>
+      <Footer />
     </Box>
+
   );
 }
 

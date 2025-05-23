@@ -20,7 +20,9 @@ export function Navbar({ user }: { user?: string }) {
         }}
       >
         <div className="navbar-logo" style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-          <img src="/images/logo-landscape.png" alt="Tidal Logo" style={{ height: '50px', width: 'auto' }} />
+          <Link to="/">
+            <img src="/images/logo-landscape.png" alt="Tidal Logo" style={{ height: '50px', width: 'auto' }} />
+          </Link>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
           <ConnectButton style={{
