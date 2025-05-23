@@ -23,7 +23,7 @@ export function EncryptedUpload({ initialAsset, onClose, showAssetList = true }:
   const [description, setDescription] = useState('');
   const [price, setPrice] = useState('');
   const [tags, setTags] = useState('');
-  const [fee, setFee] = useState('0');
+  const [fee, setFee] = useState('');
   const [isCreating, setIsCreating] = useState(false);
   const [allowlistId, setAllowlistId] = useState<string | null>(null);
   const [capId, setCapId] = useState<string | null>(null);
@@ -528,8 +528,14 @@ export function EncryptedUpload({ initialAsset, onClose, showAssetList = true }:
                 className="radix-themes"
                 placeholder="Price (in MIST)"
                 type="number"
+                step="1"
+                min="0"
                 value={fee}
-                onChange={(e: ChangeEvent<HTMLInputElement>) => setFee(e.target.value)}
+                onChange={(e: ChangeEvent<HTMLInputElement>) => {
+                  const value = e.target.value;
+                  // Only allow integers, remove leading zeros and handle empty input
+                  setFee(value === '' ? '' : String(Math.floor(Number(value))));
+                }}
               />
 
               <Button
