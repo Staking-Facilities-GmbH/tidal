@@ -4,6 +4,101 @@ Tidal is a decentralized platform for trading digital assets built on the Sui bl
 
 ## Architecture Overview
 
+```mermaid
+graph TB
+    subgraph "Frontend Layer"
+        UI[User Interface]
+        React[React Application]
+        DAppKit[DApp Kit]
+    end
+
+    subgraph "Blockchain Layer"
+        Move[Move Smart Contract]
+        Allowlist[Allowlist Object]
+        Capability[Capability Object]
+    end
+
+    subgraph "Storage Layer"
+        Walrus[Walrus Storage]
+        Blob[Blob Storage]
+        StorageProviders[Storage Providers]
+    end
+
+    subgraph "Encryption Layer"
+        Seal[Seal SDK]
+        KeyServers[Key Servers]
+        SessionKey[Session Key Management]
+    end
+
+    subgraph "Database Layer"
+        Supabase[Supabase]
+        Metadata[Asset Metadata]
+        Purchases[Purchase Records]
+        Users[User Data]
+    end
+
+    %% Frontend Interactions
+    UI --> React
+    React --> DAppKit
+    DAppKit --> Move
+    DAppKit --> Seal
+    DAppKit --> Walrus
+    DAppKit --> Supabase
+
+    %% Blockchain Interactions
+    Move --> Allowlist
+    Move --> Capability
+    Move --> Seal
+
+    %% Storage Interactions
+    Walrus --> Blob
+    Walrus --> StorageProviders
+    Seal --> Walrus
+
+    %% Encryption Interactions
+    Seal --> KeyServers
+    Seal --> SessionKey
+    KeyServers --> SessionKey
+
+    %% Database Interactions
+    Supabase --> Metadata
+    Supabase --> Purchases
+    Supabase --> Users
+
+    %% Data Flow for Asset Creation
+    subgraph "Asset Creation Flow"
+        direction LR
+        A1[1. File Upload] --> A2[2. Encryption]
+        A2 --> A3[3. Storage]
+        A3 --> A4[4. On-chain Registration]
+        A4 --> A5[5. Metadata Storage]
+    end
+
+    %% Data Flow for Asset Purchase
+    subgraph "Asset Purchase Flow"
+        direction LR
+        P1[1. Purchase Initiation] --> P2[2. Payment Processing]
+        P2 --> P3[3. Access Control]
+        P3 --> P4[4. Asset Retrieval]
+        P4 --> P5[5. Decryption]
+    end
+
+    %% Styling
+    classDef frontend fill:#f9f,stroke:#333,stroke-width:2px
+    classDef blockchain fill:#bbf,stroke:#333,stroke-width:2px
+    classDef storage fill:#bfb,stroke:#333,stroke-width:2px
+    classDef encryption fill:#fbb,stroke:#333,stroke-width:2px
+    classDef database fill:#fbf,stroke:#333,stroke-width:2px
+    classDef flow fill:#ddd,stroke:#333,stroke-width:1px
+
+    class UI,React,DAppKit frontend
+    class Move,Allowlist,Capability blockchain
+    class Walrus,Blob,StorageProviders storage
+    class Seal,KeyServers,SessionKey encryption
+    class Supabase,Metadata,Purchases,Users database
+    class A1,A2,A3,A4,A5,P1,P2,P3,P4,P5 flow
+```
+
 ### Core Components
 
 #### 1. Smart Contract Layer (Move)
