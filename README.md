@@ -191,6 +191,11 @@ SEAL_API_KEY=your_seal_key
     supabase link --project-ref <project_ref>
   ```
 
+3. Rund the migration scripts
+  ```bash
+    supabase db push
+  ```
+
 The migrations will:
 - Create the assets and purchases tables
 - Set up Row Level Security (RLS) policies
