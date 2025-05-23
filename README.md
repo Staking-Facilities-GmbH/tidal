@@ -23,7 +23,6 @@ Tidal is a decentralized platform for trading digital assets built on the Sui bl
 - 📦 Decentralized file storage with Walrus
 - 🔑 Multi-server key management
 - 📱 Modern, responsive user interface
-- 🔄 Real-time updates and notifications
 
 ## Architecture
 
