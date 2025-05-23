@@ -533,6 +533,7 @@ export function EncryptedUpload({ initialAsset, onClose, showAssetList = true }:
               />
 
               <Button
+                style={{ transform: 'none' }}
                 disabled={isCreating || !name || !fee}
                 onClick={handleCreateAllowlist}
               >

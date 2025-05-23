@@ -21,8 +21,8 @@ export function UserPurchasesPage() {
   const packageId = useNetworkVariable('packageId');
   const suiClient = useSuiClient();
   const { mutate: signPersonalMessage } = useSignPersonalMessage();
-  const [downloadStatus, setDownloadStatus] = useState<{[assetId: string]: string}>({});
-  const [downloading, setDownloading] = useState<{[assetId: string]: boolean}>({});
+  const [downloadStatus, setDownloadStatus] = useState<{ [assetId: string]: string }>({});
+  const [downloading, setDownloading] = useState<{ [assetId: string]: boolean }>({});
   const [currentSessionKey, setCurrentSessionKey] = useState<SessionKey | null>(null);
 
   const sealClient = new SealClient({
@@ -33,7 +33,7 @@ export function UserPurchasesPage() {
 
   const fetchPurchases = async () => {
     if (!account?.address) return;
-    
+
     setLoading(true);
     setError(null);
 
@@ -187,12 +187,12 @@ export function UserPurchasesPage() {
       try {
         console.log('[Decrypt] Fetching keys...');
         try {
-          await sealClient.fetchKeys({ 
-            ids: [id], 
-            txBytes, 
+          await sealClient.fetchKeys({
+            ids: [id],
+            txBytes,
             sessionKey,
             threshold: 2,
-            verifyKeyServers: false 
+            verifyKeyServers: false
           });
         } catch (keyError: any) {
           console.error('[Decrypt] Key server error details:', {
@@ -204,11 +204,11 @@ export function UserPurchasesPage() {
           throw keyError;
         }
         console.log('[Decrypt] Decrypting...');
-        const decrypted = await sealClient.decrypt({ 
-          sessionKey, 
-          data: encryptedData, 
+        const decrypted = await sealClient.decrypt({
+          sessionKey,
+          data: encryptedData,
           txBytes,
-          verifyKeyServers: false 
+          verifyKeyServers: false
         });
         // Download file
         let filename = (asset.name ? asset.name.replace(/\s+/g, '_') : 'decrypted_file') + '.gltf';
@@ -263,7 +263,7 @@ export function UserPurchasesPage() {
                         <Text weight="bold" size="4">{purchase.assets.name}</Text>
                         <Text>{purchase.assets.description}</Text>
                         <Text>Purchased: {new Date(purchase.purchased_at).toLocaleDateString()}</Text>
-                        <Button onClick={() => handleDownload(purchase.assets)} disabled={downloading[purchase.assets.id]}>
+                        <Button style={{ transform: 'none' }} onClick={() => handleDownload(purchase.assets)} disabled={downloading[purchase.assets.id]}>
                           Download 3D Model
                         </Button>
                         {downloadStatus[purchase.assets.id] && !downloadStatus[purchase.assets.id].startsWith('Decrypting') && (
@@ -282,15 +282,15 @@ export function UserPurchasesPage() {
               )}
 
               <Flex justify="between" align="center">
-                <Button 
-                  disabled={page === 1} 
+                <Button
+                  disabled={page === 1}
                   onClick={() => setPage(p => p - 1)}
                 >
                   Previous
                 </Button>
                 <Text>Page {page} of {totalPages}</Text>
-                <Button 
-                  disabled={page === totalPages} 
+                <Button
+                  disabled={page === totalPages}
                   onClick={() => setPage(p => p + 1)}
                 >
                   Next
@@ -303,7 +303,7 @@ export function UserPurchasesPage() {
 
       {selectedAsset && (
         <Card mt="4">
-          <EncryptedUpload 
+          <EncryptedUpload
             initialAsset={selectedAsset}
             onClose={() => setSelectedAsset(null)}
           />

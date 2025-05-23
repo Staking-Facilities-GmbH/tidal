@@ -264,13 +264,14 @@ export function StorePage() {
                       <Text>Price: {Number(asset.price) < 100000 ? `${Number(asset.price)}` + " MIST" : `${Number(asset.price) / Number(MIST_PER_SUI)}` + " SUI"}</Text>
                       <Text>Tags: {asset.tags.join(', ')}</Text>
                       {hasUserPurchased(asset) ? (
-                        <Button
+                        <Button style={{ transform: 'none' }}
                           onClick={() => window.location.href = `/purchases`}
                         >
                           View in My Purchases
                         </Button>
                       ) : (
                         <Button
+                          style={{ transform: 'none' }}
                           onClick={() => handlePurchase(asset)}
                           disabled={purchaseStatus[asset.id]?.startsWith('Processing')}
                         >
