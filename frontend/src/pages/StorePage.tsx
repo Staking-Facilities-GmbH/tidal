@@ -5,8 +5,9 @@ import { useCurrentAccount, useSuiClient, useSignAndExecuteTransaction } from '@
 import { Transaction } from '@mysten/sui/transactions';
 import { useNetworkVariable } from '../networkConfig';
 import { MIST_PER_SUI } from '@mysten/sui/utils';
+import { InfoCircledIcon } from '@radix-ui/react-icons';
 
-const PAGE_SIZE = 10;
+const PAGE_SIZE = 12;
 
 export function StorePage() {
   const [assetList, setAssetList] = useState<any[]>([]);
@@ -146,97 +147,92 @@ export function StorePage() {
   };
 
   return (
-    <Box>
-      <Card>
-        <Flex direction="column" gap="4">
-          <Text size="5" weight="bold">Asset Store</Text>
+    <Box style={{ maxWidth: 1200, margin: '0 auto', padding: '0 16px', minHeight: '100vh' }}>
+        <Flex direction="column" gap="6">
+          <Text size="8" weight="bold" style={{ 
+            letterSpacing: '0.04em',
+            textAlign: 'center',
+            background: 'linear-gradient(0deg, #137DFA 0%, #00eaff 100%)',
+            WebkitBackgroundClip: 'text',
+            WebkitTextFillColor: 'transparent',
+            backgroundClip: 'text',
+            color: 'transparent',
+          }}>
+            Find your favorite 3D assets here!
+          </Text>
 
-          <input
-            className="radix-themes w-[200px]"
-            placeholder="Filter by name"
-            value={filterName}
-            onChange={(e) => setFilterName(e.target.value)}
-          />
+          <Flex gap="4" wrap="wrap" justify="center">
+            <input
+              className="radix-themes"
+              placeholder="Filter by name"
+              value={filterName}
+              onChange={(e) => setFilterName(e.target.value)}
+              style={{
+                background: 'rgba(20, 24, 34, 0.7)',
+                border: '1px solid rgba(19,125,250,0.07)',
+                borderRadius: 12,
+                padding: '8px 16px',
+                color: '#fff',
+                width: '200px',
+                height: '40px',
+              }}
+            />
+          </Flex>
 
-          <Popover.Root>
-            <Popover.Trigger>
+          <Flex gap="2" wrap="wrap" justify="center">
+            {availableTags.map((tag) => (
               <Button
-                variant="soft"
+                key={tag}
+                size="2"
+                variant={selectedTags.includes(tag) ? 'solid' : 'soft'}
                 style={{
-                  justifyContent: 'flex-start',
-                  width: 'fit-content',
-                  height: '32px',
-                  transform: 'none'
+                  background: selectedTags.includes(tag)
+                    ? 'linear-gradient(90deg, #137DFA 0%, #00eaff 100%)'
+                    : 'rgba(255,255,255,0.07)',
+                  color: selectedTags.includes(tag)
+                    ? '#fff'
+                    : '#fff',
+                  border: selectedTags.includes(tag)
+                    ? '1.5px solid #00eaff'
+                    : '1px solid rgba(19,125,250,0.10)',
+                  borderRadius: 14,
+                  fontWeight: 500,
+                  fontSize: 15,
+                  boxShadow: selectedTags.includes(tag)
+                    ? '0 2px 8px #00eaff33'
+                    : 'none',
+                  padding: '6px 18px',
+                  marginBottom: 2,
+                  cursor: 'pointer',
+                  transition: 'background 0.15s, box-shadow 0.15s, color 0.15s',
+                }}
+                onClick={() => {
+                  if (selectedTags.includes(tag)) {
+                    setSelectedTags(selectedTags.filter(t => t !== tag));
+                  } else {
+                    setSelectedTags([...selectedTags, tag]);
+                  }
                 }}
               >
-                Select tags to filter {selectedTags.length > 0 && `(${selectedTags.length})`}
+                {tag}
               </Button>
-            </Popover.Trigger>
-            <Popover.Content>
-              <Flex direction="column" gap="2" style={{ maxHeight: '300px', overflowY: 'auto' }}>
-                {selectedTags.length > 0 && (
-                  <div
-                    onClick={() => setSelectedTags([])}
-                    style={{
-                      padding: '8px',
-                      cursor: 'pointer',
-                      width: '100%',
-                      backgroundColor: 'transparent',
-                      transition: 'background-color 0.2s',
-                      borderBottom: '1px solid var(--gray-5)',
-                      marginBottom: '4px'
-                    }}
-                    onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--gray-3)'}
-                    onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
-                  >
-                    <Flex align="center" gap="2">
-                      <Text color="red">Clear filters</Text>
-                    </Flex>
-                  </div>
-                )}
-                {availableTags.map((tag) => (
-                  <div
-                    key={tag}
-                    onClick={() => {
-                      if (selectedTags.includes(tag)) {
-                        setSelectedTags(selectedTags.filter(t => t !== tag));
-                      } else {
-                        setSelectedTags([...selectedTags, tag]);
-                      }
-                    }}
-                    style={{
-                      padding: '8px',
-                      cursor: 'pointer',
-                      width: '100%',
-                      backgroundColor: 'transparent',
-                      transition: 'background-color 0.2s'
-                    }}
-                    onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--gray-3)'}
-                    onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
-                  >
-                    <Flex align="center" gap="2">
-                      <input
-                        type="checkbox"
-                        checked={selectedTags.includes(tag)}
-                        readOnly
-                        style={{ margin: 0 }}
-                      />
-                      {tag}
-                    </Flex>
-                  </div>
-                ))}
-              </Flex>
-            </Popover.Content>
-          </Popover.Root>
+            ))}
+          </Flex>
 
           {selectedTags.length > 0 && (
-            <Flex gap="2" wrap="wrap">
+            <Flex gap="2" wrap="wrap" justify="center">
               {selectedTags.map((tag) => (
                 <Button
                   key={tag}
                   size="1"
                   variant="soft"
                   onClick={() => setSelectedTags(selectedTags.filter(t => t !== tag))}
+                  style={{
+                    background: 'rgba(19,125,250,0.1)',
+                    border: '1px solid rgba(19,125,250,0.2)',
+                    color: '#fff',
+                    borderRadius: 12,
+                  }}
                 >
                   {tag} ×
                 </Button>
@@ -245,59 +241,200 @@ export function StorePage() {
           )}
 
           {assetError && (
-            <Text color="red">{assetError}</Text>
+            <Text color="red" align="center">{assetError}</Text>
           )}
 
           {assetLoading ? (
-            <Text>Loading assets...</Text>
+            <Text align="center" style={{ color: '#fff' }}>Loading assets...</Text>
           ) : (
-            <Flex direction="column" gap="2">
-              {assetList.map((asset) => (
-                <Card key={asset.id}>
-                  <div className="asset-info">
-                    {asset.preview_gif_url && (
-                      <img className="preview-gif" src={asset.preview_gif_url} alt="3D Preview" />
-                    )}
-                    <div className="asset-details">
-                      <Text weight="bold" size="4">{asset.name}</Text>
-                      <Text>{asset.description}</Text>
-                      <Text>Price: {Number(asset.price) < 100000 ? `${Number(asset.price)}` + " MIST" : `${Number(asset.price) / Number(MIST_PER_SUI)}` + " SUI"}</Text>
-                      <Text>Tags: {asset.tags.join(', ')}</Text>
+            <Flex direction="column" gap="4">
+              <div style={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(3, minmax(260px, 1fr))',
+                gap: '15px',
+                justifyContent: 'center',
+                alignItems: 'stretch',
+                width: '100%',
+                maxWidth: '100%',
+              }}>
+                {assetList.map((asset) => (
+                  <Card key={asset.id} style={{
+                    background: 'linear-gradient(135deg, rgba(30,32,60,0.98) 60%, rgba(19,125,250,0.10) 100%)',
+                    borderRadius: 20,
+                    boxShadow: '0 4px 24px #137dfa33',
+                    padding: 0,
+                    overflow: 'hidden',
+                    border: '1.5px solid rgba(19,125,250,0.10)',
+                    transition: 'transform 0.15s, box-shadow 0.15s',
+                    minWidth: 0,
+                  }}
+                  onMouseOver={e => {
+                    e.currentTarget.style.transform = 'translateY(-6px) scale(1.03)';
+                    e.currentTarget.style.boxShadow = '0 8px 32px #137dfa55';
+                  }}
+                  onMouseOut={e => {
+                    e.currentTarget.style.transform = '';
+                    e.currentTarget.style.boxShadow = '0 4px 24px #137dfa33';
+                  }}>
+                    <div style={{ width: '100%', height: 200, overflow: 'hidden', background: 'linear-gradient(135deg, #e0f7fa 0%, #b3c6ff 100%)', borderTopLeftRadius: 20, borderTopRightRadius: 20, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 0 }}>
+                      {asset.preview_gif_url ? (
+                        <img 
+                          className="preview-gif" 
+                          src={asset.preview_gif_url} 
+                          alt="3D Preview"
+                          style={{
+                            width: '100%',
+                            objectFit: 'cover',
+                            borderTopLeftRadius: 20,
+                            borderTopRightRadius: 20,
+                            background: 'transparent',
+                            display: 'block',
+                            margin: 0,
+                            padding: 0,
+                          }}
+                        />
+                      ) : (
+                        <span style={{ color: '#8a8fa3', fontSize: 18 }}>—</span>
+                      )}
+                    </div>
+                    <div style={{ padding: '12px 14px 14px 14px', display: 'flex', flexDirection: 'column', gap: 7 }}>
+                      <Flex gap="2" wrap="wrap" style={{ marginBottom: 2, rowGap: 4 }}>
+                        {asset.tags.map((tag: string) => (
+                          <Text key={tag} size="1" style={{
+                            background: 'linear-gradient(90deg,rgb(253, 253, 253) 0%,rgb(63, 179, 189) 100%)',
+                            color: '#000',
+                            padding: '1.5px 10px',
+                            borderRadius: 16,
+                            border: '1px solid rgba(19,125,250,0.18)',
+                            fontWeight: 500,
+                            fontSize: 12,
+                            boxShadow: '0 1px 4px #137dfa22',
+                            marginBottom: 0,
+                          }}>
+                            {tag}
+                          </Text>
+                        ))}
+                      </Flex>
+                      <Flex align="center" gap="2" style={{ marginBottom: 1 }}>
+                        <Text weight="bold" size="4" style={{ color: '#fff', letterSpacing: 0.2, margin: 0 }}>{asset.name}</Text>
+                        <Popover.Root>
+                          <Popover.Trigger>
+                            <Button
+                              variant="ghost"
+                              style={{
+                                padding: 0,
+                                width: 22,
+                                height: 22,
+                                minWidth: 22,
+                                borderRadius: '50%',
+                                background: 'rgba(19,125,250,0.13)',
+                                border: '1px solid rgba(19,125,250,0.18)',
+                                color: '#fff',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                fontSize: 16,
+                                marginLeft: 4,
+                                cursor: 'pointer',
+                                transition: 'background 0.15s, box-shadow 0.15s',
+                              }}
+                              onMouseOver={e => e.currentTarget.style.background = 'rgba(19,125,250,0.22)'}
+                              onMouseOut={e => e.currentTarget.style.background = 'rgba(19,125,250,0.13)'}
+                            >
+                              <InfoCircledIcon width={16} height={16} />
+                            </Button>
+                          </Popover.Trigger>
+                          <Popover.Content>
+                            <Box style={{ 
+                              background: 'rgba(30, 32, 60, 0.98)',
+                              borderRadius: 14,
+                              padding: 14,
+                              maxWidth: 320,
+                              border: '1px solid rgba(19,125,250,0.18)',
+                              boxShadow: '0 2px 12px #137dfa33',
+                            }}>
+                              <Text style={{ color: '#fff', fontSize: 15 }}>{asset.description}</Text>
+                            </Box>
+                          </Popover.Content>
+                        </Popover.Root>
+                      </Flex>
+                      <Flex align="center" gap="2" style={{ marginBottom: 1 }}>
+                        <Text style={{ color: '#fff', fontWeight: 600, fontSize: 16, margin: 0 }}>
+                          Price: {Number(asset.price) < 100000 ? `${Number(asset.price)}` + " MIST" : `${Number(asset.price) / Number(MIST_PER_SUI)}` + " SUI"}
+                        </Text>
+                      </Flex>
                       {hasUserPurchased(asset) ? (
-                        <Button style={{ transform: 'none' }}
+                        <Button 
+                          style={{ 
+                            width: '100%',
+                            background: 'linear-gradient(90deg, #137DFA 0%, #00eaff 100%)',
+                            color: '#fff',
+                            transform: 'none',
+                            borderRadius: 18,
+                            fontWeight: 700,
+                            fontSize: 16,
+                            boxShadow: '0 2px 12px #00eaff33',
+                            marginTop: 6,
+                          }}
                           onClick={() => window.location.href = `/purchases`}
                         >
                           View in My Purchases
                         </Button>
                       ) : (
                         <Button
-                          style={{ transform: 'none' }}
+                          style={{ 
+                            alignSelf: 'center',
+                            width: '50%',
+                            background: 'linear-gradient(90deg, #137DFA 0%, #00eaff 100%)',
+                            color: '#fff',
+                            transform: 'none',
+                            borderRadius: 18,
+                            fontWeight: 700,
+                            fontSize: 16,
+                            boxShadow: '0 2px 12px #00eaff33',
+                            marginTop: 6,
+                            transition: 'transform 0.12s, filter 0.12s',
+                          }}
+                          onMouseOver={e => { e.currentTarget.style.filter = 'brightness(1.08)'; e.currentTarget.style.transform = 'scale(1.03)'; }}
+                          onMouseOut={e => { e.currentTarget.style.filter = ''; e.currentTarget.style.transform = ''; }}
                           onClick={() => handlePurchase(asset)}
                           disabled={purchaseStatus[asset.id]?.startsWith('Processing')}
                         >
-                          Buy 3D Asset
+                          {purchaseStatus[asset.id] || 'Buy'}
                         </Button>
                       )}
                     </div>
-                  </div>
-                </Card>
-              ))}
+                  </Card>
+                ))}
+              </div>
 
               {assetList.length === 0 && (
-                <Text>No assets found</Text>
+                <Text align="center" style={{ color: '#fff' }}>No assets found</Text>
               )}
 
-              <Flex justify="between" align="center">
+              <Flex justify="center" align="center" gap="4" mt="4">
                 <Button
                   disabled={page === 1}
                   onClick={() => setPage(p => p - 1)}
+                  style={{
+                    background: 'rgba(20, 24, 34, 0.7)',
+                    border: '1px solid rgba(19,125,250,0.07)',
+                    color: '#fff',
+                    borderRadius: 12,
+                  }}
                 >
                   Previous
                 </Button>
-                <Text>Page {page} of {totalPages}</Text>
+                <Text style={{ color: '#fff' }}>Page {page} of {totalPages}</Text>
                 <Button
                   disabled={page === totalPages}
                   onClick={() => setPage(p => p + 1)}
+                  style={{
+                    background: 'rgba(20, 24, 34, 0.7)',
+                    border: '1px solid rgba(19,125,250,0.07)',
+                    color: '#fff',
+                    borderRadius: 12,
+                  }}
                 >
                   Next
                 </Button>
@@ -305,7 +442,6 @@ export function StorePage() {
             </Flex>
           )}
         </Flex>
-      </Card>
     </Box>
   );
 } 

@@ -100,8 +100,6 @@ img.preview-gif {
   box-shadow: 0 2px 16px var(--color-primary-glow);
   background: #181c2a;
   object-fit: contain;
-  width: 96px;
-  height: 96px;
   margin-right: 1.5rem;
 }
 
@@ -179,8 +177,6 @@ img.preview-gif {
     gap: 0.5rem;
   }
   img.preview-gif {
-    width: 64px;
-    height: 64px;
     margin-right: 0.5rem;
   }
 }
