@@ -8,12 +8,13 @@ import { StorePage } from './pages/StorePage';
 import { CreateAssetPage } from './pages/CreateAssetPage';
 import { UserPurchasesPage } from './pages/UserPurchasesPage';
 import { Navbar } from './components/Navbar';
+import { LandingPage } from './pages/LandingPage';
 
 function App() {
   return (
     <Box>
       <Navbar />
-      <Flex 
+      {/* <Flex 
         p="4" 
         justify="between" 
         align="center" 
@@ -26,8 +27,8 @@ function App() {
         }}
       >
         <Flex gap="4">
-          <Link to="/">
-            <Button variant="ghost" className="nav-btn">Store</Button>
+          <Link to="/marketplace">
+            <Button variant="ghost" className="nav-btn">Marketplace</Button>
           </Link>
           <Link to="/create">
             <Button variant="ghost" className="nav-btn">Create Asset</Button>
@@ -36,11 +37,12 @@ function App() {
             <Button variant="ghost" className="nav-btn">My Purchases</Button>
           </Link>
         </Flex>
-      </Flex>
+      </Flex> */}
 
       <Box p="4">
         <Routes>
-          <Route path="/" element={<StorePage />} />
+          <Route path="/" element={<LandingPage />} />
+          <Route path="/marketplace" element={<StorePage />} />
           <Route path="/create" element={<CreateAssetPage />} />
           <Route path="/purchases" element={<UserPurchasesPage />} />
         </Routes>
