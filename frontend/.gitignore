@@ -3,3 +3,6 @@
 /move/build
 node_modules
 .env.local
+supabase/.temp/*
+dist/
+tsconfig.tsbuildinfo
