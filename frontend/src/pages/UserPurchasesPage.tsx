@@ -191,8 +191,7 @@ export function UserPurchasesPage() {
             ids: [id], 
             txBytes, 
             sessionKey,
-            threshold: 2,
-            verifyKeyServers: false 
+            threshold: 2
           });
         } catch (keyError: any) {
           console.error('[Decrypt] Key server error details:', {
@@ -207,8 +206,7 @@ export function UserPurchasesPage() {
         const decrypted = await sealClient.decrypt({ 
           sessionKey, 
           data: encryptedData, 
-          txBytes,
-          verifyKeyServers: false 
+          txBytes
         });
         // Download file
         let filename = (asset.name ? asset.name.replace(/\s+/g, '_') : 'decrypted_file') + '.gltf';
